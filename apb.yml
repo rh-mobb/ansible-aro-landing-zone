@@ -1,0 +1,13 @@
+version: '1.0.0'
+name: aro-landing-zone
+description: your role description
+bindable: False
+async: optional
+metadata:
+  displayName: aro-landing-zone
+plans:
+  - name: default
+    description: This default plan deploys aro-landing-zone
+    free: True
+    metadata: {}
+    parameters: []

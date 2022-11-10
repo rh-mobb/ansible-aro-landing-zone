@@ -1,0 +1,6 @@
+- name: Destroy aro cluster
+  azure.azcollection.azure_rm_openshiftmanagedcluster:
+    resource_group: "{{ aro_resource_group }}"
+    name: "{{ aro_cluster_name }}"
+    location: "{{ aro_location }}"
+    state: absent
