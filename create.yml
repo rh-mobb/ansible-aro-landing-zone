@@ -9,11 +9,18 @@
     hub_name: "{{ hub_name_override | default(prefix + '-hub-aro') }}"
     spoke_name: "{{ spoke_name_override | default(prefix + '-spoke-aro') }}"
   roles:
+    - role: _pre
     - role: resource_group
       vars:
         rg_hub_name: "{{ hub_name }}-rg"
         rg_spoke_name: "{{ spoke_name }}-rg"
         rg_location: "{{ location }}"
+    - role: keyvault
+      vars:
+        keyvault_name: "{{ hub_name }}"
+        keyvault_resource_group: "{{ output_rg_hub_name | default( hub_name + '-rg')  }}"
+        keyvault_tenant_id: "{{ azure_tenant_id }}"
+        keyvault_subscription_id: "{{ azure_subscription_id }}"
     - role: vnet
       vars:
         vnet_location: "{{ location }}"
@@ -25,9 +32,11 @@
     - role: service-principal
       vars:
         sp_aro_sp_password: "{{ aro_sp_password }}"
-        sp_aro_rg: "{{ output_rg_spole_name | default( spoke_name + '-rg') }}"
+        sp_aro_rg: "{{ output_rg_spoke_name | default( spoke_name + '-rg') }}"
         sp_aro_cluster_name: "{{ cluster_name }}"
         sp_aro_vnet_name: "{{ spoke_name }}-vnet"
+        sp_subscription_id: "{{ azure_subscription_id }}"
+        sp_tenant_id: "{{ azure_tenant_id }}"
     - role: aro
       vars:
         aro_resource_group:  "{{ output_rg_spoke_name | default( spoke_name + '-rg') }}"
@@ -38,3 +47,13 @@
         aro_worker_subnet_id: "{{ output_vnet_worker_subnet_id }}"
         aro_sp_client_id: "{{ output_sp_app_id }}"
         aro_sp_client_secret: "{{ aro_sp_password }}"
+    - role: jumpbox
+      vars:
+        jumbox_name: "{{ hub_name }}-jump"
+        jumpbox_resource_group: "{{ output_rg_hub_name | default( hub_name + '-rg')  }}"
+        jumpbox_subnet_name: "{{ output_vnet_vm_subnet_name }}"
+        jumpbox_vnet_name: "{{ hub_name }}-vnet"
+    - role: finish
+      vars:
+        aro_cluster_name: "{{ cluster_name }}"
+        aro_resource_group:  "{{ output_rg_spoke_name | default( spoke_name + '-rg') }}"

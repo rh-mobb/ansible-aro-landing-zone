@@ -1,0 +1,19 @@
+- name: Destroy jumpbox vm
+  azure_rm_virtualmachine:
+    resource_group: "{{ jumpbox_resource_group }}"
+    name: "{{ jumbox_name }}"
+    state: absent
+
+- name: Create windows jumpbox vm
+  azure_rm_virtualmachine:
+    resource_group: "{{ jumpbox_resource_group }}"
+    name: "jumphost-win"
+    state: absent
+
+- name: Create a network interface with private IP address only (no Public IP)
+  azure_rm_networkinterface:
+    name: "{{ jumbox_name }}-win-nic"
+    resource_group: "{{ jumpbox_resource_group }}"
+    subnet_name: "{{ jumpbox_subnet_name }}"
+    virtual_network: "{{ jumpbox_vnet_name }}"
+    state: absent

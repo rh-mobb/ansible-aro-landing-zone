@@ -33,6 +33,7 @@
 #   register: _private_endpoint_subnet
 
 - include_tasks: udr.yml
+  when: vnet_egress_lockdown | bool
 
 - name: Create an aro control plane subnet
   azure_rm_subnet:
@@ -46,8 +47,8 @@
     private_link_service_network_policies: Disabled
     private_endpoint_network_policies: Disabled
     route_table:
-      name: "aro-udr"
-      resource_group: "{{ vnet_hub_rg }}"
+      name: "{{ vnet_egress_lockdown | bool | ternary('aro-udr', omit) }}"
+      resource_group: "{{ vnet_egress_lockdown | bool | ternary(vnet_hub_rg, omit) }}"
   register: _control_subnet
 
 - name: Create an aro worker subnet
@@ -61,6 +62,6 @@
       - service: "Microsoft.Storage"
     private_link_service_network_policies: Disabled
     route_table:
-      name: "aro-udr"
-      resource_group: "{{ vnet_hub_rg }}"
+      name: "{{ vnet_egress_lockdown | bool | ternary('aro-udr', omit) }}"
+      resource_group: "{{ vnet_egress_lockdown | bool | ternary(vnet_hub_rg, omit) }}"
   register: _worker_subnet

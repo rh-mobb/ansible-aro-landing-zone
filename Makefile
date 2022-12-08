@@ -35,6 +35,9 @@ virtualenv:
 create:
 	$(ANSIBLE) -v create.yml
 
+create.public:
+	$(ANSIBLE) -v create.yml -i ./environment/public/hosts
+
 destroy:
 	$(ANSIBLE) -v destroy.yml
 

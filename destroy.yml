@@ -12,6 +12,8 @@
     rg_spoke_name: "{{ spoke_name }}-rg"
   tasks:
     - import_role:
+        name: _pre
+    - import_role:
         name: aro
         tasks_from: destroy.yml
       vars:
@@ -24,6 +26,18 @@
       vars:
         sp_aro_rg: "{{ rg_spoke_name }}"
         sp_aro_cluster_name: "{{ cluster_name }}"
+    - import_role:
+        name: bastion
+        tasks_from: destroy.yml
+      vars:
+        bastion_name: "{{ hub_name }}-bastion"
+        bastion_resource_group: "{{ rg_hub_name }}"
+    - import_role:
+        name: jumpbox
+        tasks_from: destroy.yml
+      vars:
+        jumbox_name: "{{ hub_name }}-jump"
+        jumpbox_resource_group: "{{ rg_hub_name  }}"
     - import_role:
         name: vnet
         tasks_from: destroy.yml

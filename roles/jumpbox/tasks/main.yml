@@ -1,0 +1,30 @@
+---
+# tasks file for roles/jumphost-create
+
+# azr_jumphost: true
+# azr_jumphost_ssh_key: ~/.ssh/id_rsa
+# azr_jumphost_subnet:
+#   name: jumphost
+#   address_prefix_cidr: "10.0.3.0/24"
+
+- name: Create jumpbox vm
+  azure_rm_virtualmachine:
+    resource_group: "{{ jumpbox_resource_group }}"
+    name: "{{ jumbox_name }}"
+    admin_username: "{{ jumpbox_username }}"
+    ssh_password_enabled: false
+    ssh_public_keys:
+      - path: "/home/aro/.ssh/authorized_keys"
+        key_data: "{{ lookup('file',jumpbox_ssh_key) }}"
+    subnet_name: "{{ jumpbox_subnet_name }}"
+    vm_size: Standard_DS2_v2
+    image:
+      offer: "RHEL"
+      publisher: "RedHat"
+      version: "latest"
+      sku: "8.2"
+    custom_data: "{{ lookup('file', 'user_data.sh') }}"
+  register: _jumphost
+
+- include_tasks: windows.yml
+

@@ -25,6 +25,7 @@ vnet_app_gw_subnet_name: AppGW-subnet
 vnet_app_gw_subnet_prefix: "10.1.5.0/27"
 
 # Azure Firewall
+vnet_egress_lockdown: yes
 vnet_use_firewall_as_dns: no
 vnet_fw_name: "azfw"
 vnet_fw_subnet_prefix: "10.0.0.0/26"

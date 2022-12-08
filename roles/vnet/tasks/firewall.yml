@@ -23,10 +23,16 @@
         name: "Aro-required-ports"
         rules:
           - name: 'NTP'
-            source_addresses: ["0.0.0.0"] # {{ vnet_hub_prefix }}", "{{ vnet_spoke_prefix }}"]
+            source_addresses: ['*'] # {{ vnet_hub_prefix }}", "{{ vnet_spoke_prefix }}"]
             destination_addresses: ['*']
             destination_ports: ['123']
             protocols: ['any']
+            # todo - push peer traffic via fw
+          - name: 'OCP'
+            source_addresses: ['*']
+            destination_addresses: ["{{ vnet_spoke_prefix }}"]
+            destination_ports: ['6443', '443']
+            protocols: ['TCP']
     application_rule_collections:
       - priority: 200
         action: allow

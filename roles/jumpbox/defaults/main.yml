@@ -1,0 +1,11 @@
+---
+# defaults file for roles/jumphost-create
+
+jumbox_name: jumpbox
+jumpbox_size: Standard_D4s_v3
+jumpbox_resource_group: jumpbox-rg
+jumpbox_ssh_key: "~/.ssh/id_rsa.pub"
+jumpbox_subnet_name: jumbox-subnet
+jumpbox_vnet_name: jumbox-subnet
+jumpbox_username: aro
+jumpbox_password: 'letM3In!'

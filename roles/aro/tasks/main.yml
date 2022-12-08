@@ -32,4 +32,4 @@
     - _aro_cluster.failed
     - _aro_cluster.msg != "module doesn't support cluster update yet"
 
-- include_tasks: wait-for-cluster.yml
+# - include_tasks: wait-for-cluster.yml

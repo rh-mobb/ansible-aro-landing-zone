@@ -1,0 +1,10 @@
+---
+# defaults file for roles/keyvault
+keyvault_name: keyvault-kv
+keyvault_resource_group: keyvault-rg
+
+# leave unset to use resource group location
+# keyvault_location:
+
+keyvault_tenant_id: ""
+keyvault_subscription_id: ""

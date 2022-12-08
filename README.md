@@ -24,6 +24,16 @@ make virtualenv
 make create
 ```
 
+### Accessing the cluster
+
+1. Enable az ssh extenstion
+
+   ```bash
+   az extension add -n ssh
+   ```
+
+1. SSH into the jumphost
+
 ## Cleanup
 
 ```bash

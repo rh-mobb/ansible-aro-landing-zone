@@ -1,0 +1,7 @@
+---
+# defaults file for roles/frontdoor
+frontdoor_pls_name: aro-pls
+frontdoor_afd_name: aroafd
+frontdoor_resource_group: fd-rg
+frontdoor_subnet_id:
+frontdoor_afd_sku: Premium_AzureFrontDoor

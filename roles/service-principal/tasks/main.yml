@@ -1,14 +1,17 @@
 ---
 # tasks file for roles/service-principal
 # make sure we have known subscription id and tenant id
-- include_tasks: info.yml
+# - include_tasks: info.yml
+
+- set_fact:
+    app_display_name: "http://aro-{{ sp_aro_cluster_name }}"
 
 # azure_rm_adapplication creates a new app every time its run, this
 # block checks for an existing and uses that making it more idempotent.
 - block:
     - name: check for existing ad app
       azure.azcollection.azure_rm_adapplication_info:
-        tenant: "{{ _azr_tenant_id }}"
+        tenant: "{{ sp_tenant_id }}"
       register: _ad_applications
       no_log: true
 
@@ -21,7 +24,7 @@
     # Create AD application
     - name: Create ad application
       azure.azcollection.azure_rm_adapplication:
-        tenant: "{{ _azr_tenant_id }}"
+        tenant: "{{ sp_tenant_id }}"
         display_name: "{{ app_display_name }}"
       register: _ad_application_created
       when: _ad_application_existing is not defined
@@ -35,7 +38,7 @@
 - name: create ad sp
   azure.azcollection.azure_rm_adserviceprincipal:
     app_id: "{{ _azr_service_principal_application_id }}"
-    tenant: "{{ _azr_tenant_id }}"
+    tenant: "{{ sp_tenant_id }}"
     state: present
   register: _ad_sp
 
@@ -47,7 +50,7 @@
 - name: fetch service principal info
   azure.azcollection.azure_rm_adserviceprincipal_info:
     app_id: "{{ _azr_service_principal_application_id }}"
-    tenant: "{{ _azr_tenant_id }}"
+    tenant: "{{ sp_tenant_id }}"
   register: _ad_sp_info
 
 - set_fact:
@@ -57,13 +60,13 @@
   azure.azcollection.azure_rm_adpassword:
     app_id: "{{ _azr_service_principal_application_id }}"
     value: "{{ sp_aro_sp_password }}"
-    tenant: "{{ _azr_tenant_id }}"
+    tenant: "{{ sp_tenant_id }}"
   when: _ad_sp.changed or update_sp_password
 
 # Get object id for role definition of ARO Subscription
 - name: Obtain ARO Resource Group Role Definition Scope
   azure.azcollection.azure_rm_roledefinition_info:
-    scope: "/subscriptions/{{ _azr_subscription_id }}"
+    scope: "/subscriptions/{{ sp_subscription_id }}"
   register: sub_roledef_scope_output
   no_log: true
 
@@ -81,11 +84,11 @@
 
 - name: Give ARO Subscription Contributor Role to the Service Principal
   azure.azcollection.azure_rm_roleassignment:
-    scope: "/subscriptions/{{ _azr_subscription_id }}"
+    scope: "/subscriptions/{{ sp_subscription_id }}"
     assignee_object_id: "{{ _sp_oid }}"
     role_definition_id: "{{ sub_oid }}"
-    tenant: "{{ _azr_tenant_id }}"
-    subscription_id: "{{ _azr_subscription_id }}"
+    tenant: "{{ sp_tenant_id }}"
+    subscription_id: "{{ sp_subscription_id }}"
   retries: 10
   delay: 60
 
@@ -93,7 +96,7 @@
 - name: get ad sp for ARO info
   azure_rm_adserviceprincipal_info:
     display_name: "Azure Red Hat OpenShift RP"
-    tenant: "{{ _azr_tenant_id }}"
+    tenant: "{{ sp_tenant_id }}"
   register: _aro_rp_info
 
 - set_fact:
@@ -102,7 +105,7 @@
 # Get object id for role definition of ARO resource group
 - name: Obtain ARO Resource Group Role Definition Scope
   azure.azcollection.azure_rm_roledefinition_info:
-    scope: "/subscriptions/{{ _azr_subscription_id }}/resourceGroups/{{ sp_aro_rg }}"
+    scope: "/subscriptions/{{ sp_subscription_id }}/resourceGroups/{{ sp_aro_rg }}"
   register: _rg_roledef_scope_output
   no_log: true
 
@@ -118,28 +121,10 @@
   set_fact:
     _contributor_oid: "{{ _contributor_role_defs.ansible_facts.fact[0][0] }}"
 
-# - name: Obtain Object ID of User Access Administrator Role Definition
-#   set_fact:
-#     fact: "{{ _rg_roledef_scope_output | json_query(jmesquery) }}"
-#   register: _user_access_admin_role_defs
-#   vars:
-#     jmesquery: "roledefinitions[?role_name == 'User Access Administrator'].[id]"
-#   no_log: false
-
-# - name: Setting Object ID scope variable for the ARO Resource Group
-#   set_fact:
-#     _user_access_admin_oid: "{{ _user_access_admin_role_defs.ansible_facts.fact[0][0] }}"
-
 - name: Granting the ARO Resource Provider Contributor access to the subscription # ARO virtual network
   azure.azcollection.azure_rm_roleassignment:
-    scope: "/subscriptions/{{ _azr_subscription_id }}/resourceGroups/{{ sp_aro_rg }}/providers/Microsoft.Network/virtualNetworks/{{ sp_aro_vnet_name }}"
+    scope: "/subscriptions/{{ sp_subscription_id }}/resourceGroups/{{ sp_aro_rg }}/providers/Microsoft.Network/virtualNetworks/{{ sp_aro_vnet_name }}"
     assignee_object_id: "{{ _azr_aro_provider_id }}"
     role_definition_id: "{{ _contributor_oid }}"
-
-# - name: Granting the ARO Resource Provider user access admin access to the subscription # access to the ARO virtual network
-#   azure.azcollection.azure_rm_roleassignment:
-#     scope: "/subscriptions/{{ _azr_subscription_id }}" # /resourceGroups/{{ sp_aro_rg }}/providers/Microsoft.Network/virtualNetworks/{{ sp_aro_vnet_name }}"
-#     assignee_object_id: "{{ _azr_aro_provider_id }}"
-#     role_definition_id: "{{ _user_access_admin_oid }}"
 
 - include_tasks: output.yml
