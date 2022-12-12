@@ -2,13 +2,15 @@
 
 This Ansible deployment bundle contains everything needed to stand up an Azure Red Hat OpenShift cluster in an Azure Landing Zone.
 
+It's currently stand alone while in development but is modeled to match the architectures found in the [Azure ARO Landing Zone Accelerator](https://github.com/Azure/ARO-Landing-Zone-Accelerator).
+
 ## Requirements
 
 Ansible and Python requirements are captured in `./requirements.txt` on a Linux system you can run `make virtualenv` to deploy Ansible and its dependencies in `./virtualenv` and then active it.
 
-## APB Variables
+## Variables and Configuration
 
-TODO
+There are a large number of variables that can be set to deploy this project, however the more common ones are captured in the inventory file `environment/private/group_vars/all.yml`
 
 ## Using
 
@@ -26,13 +28,11 @@ make create
 
 ### Accessing the cluster
 
-1. Enable az ssh extenstion
+If you deployed a private cluster using the above `make create` command there are two ways to access your cluster. One is through the Linux jumphost which has a public IP, The other is through the Windows jumphost which can be accessed via a Bastion connection in your Azure Portal.
 
-   ```bash
-   az extension add -n ssh
-   ```
+The username for both is `aro` and you can find the password in the `jumpbox-password` secret that is created in the Key Vault named `lz-hub-aro-kv`.
 
-1. SSH into the jumphost
+You can run OC commands to log into the cluster from either. You can also use `sshuttle` and similar tools to tunnel your local connection through the linux jumphost.
 
 ## Cleanup
 

@@ -4,13 +4,13 @@
     name: "{{ jumbox_name }}"
     state: absent
 
-- name: Create windows jumpbox vm
+- name: Destroy windows jumpbox vm
   azure_rm_virtualmachine:
     resource_group: "{{ jumpbox_resource_group }}"
-    name: "jumphost-win"
+    name: "jumpbox-win"
     state: absent
 
-- name: Create a network interface with private IP address only (no Public IP)
+- name: Destroy jumpbox nic
   azure_rm_networkinterface:
     name: "{{ jumbox_name }}-win-nic"
     resource_group: "{{ jumpbox_resource_group }}"

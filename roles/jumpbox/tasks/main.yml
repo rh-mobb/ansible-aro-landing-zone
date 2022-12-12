@@ -1,21 +1,23 @@
 ---
 # tasks file for roles/jumphost-create
+- include_tasks: secrets.yml
 
-# azr_jumphost: true
-# azr_jumphost_ssh_key: ~/.ssh/id_rsa
-# azr_jumphost_subnet:
-#   name: jumphost
-#   address_prefix_cidr: "10.0.3.0/24"
+- set_fact:
+    _ssh_public_keys:
+      - path: "/home/{{ jumpbox_username }}/.ssh/authorized_keys"
+        key_data: "{{ lookup('file',jumpbox_ssh_key) }}"
+  when:
+    - (jumpbox_ssh_key is defined) and
+      (jumpbox_ssh_key != "")
 
 - name: Create jumpbox vm
   azure_rm_virtualmachine:
     resource_group: "{{ jumpbox_resource_group }}"
     name: "{{ jumbox_name }}"
     admin_username: "{{ jumpbox_username }}"
-    ssh_password_enabled: false
-    ssh_public_keys:
-      - path: "/home/aro/.ssh/authorized_keys"
-        key_data: "{{ lookup('file',jumpbox_ssh_key) }}"
+    admin_password: "{{ jumpbox_password }}"
+    ssh_password_enabled: "{{ jumpbox_ssh_password_enabled }}"
+    ssh_public_keys: "{{ _ssh_public_keys | default(omit) }}"
     subnet_name: "{{ jumpbox_subnet_name }}"
     vm_size: Standard_DS2_v2
     image:

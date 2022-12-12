@@ -14,6 +14,11 @@
     - import_role:
         name: _pre
     - import_role:
+        name: frontdoor
+        tasks_from: destroy.yml
+      vars:
+        frontdoor_resource_group: "{{ output_rg_spoke_name | default( spoke_name + '-rg') }}"
+    - import_role:
         name: aro
         tasks_from: destroy.yml
       vars:
@@ -26,6 +31,15 @@
       vars:
         sp_aro_rg: "{{ rg_spoke_name }}"
         sp_aro_cluster_name: "{{ cluster_name }}"
+    - import_role:
+        name: keyvault
+        tasks_from: destroy.yml
+      vars:
+        keyvault_name: "{{ hub_name }}-kv"
+        keyvault_resource_group: "{{ output_rg_hub_name | default( hub_name + '-rg')  }}"
+        keyvault_tenant_id: "{{ azure_tenant_id }}"
+        keyvault_subscription_id: "{{ azure_subscription_id }}"
+
     - import_role:
         name: bastion
         tasks_from: destroy.yml

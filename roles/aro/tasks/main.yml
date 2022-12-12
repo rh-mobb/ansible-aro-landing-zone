@@ -1,13 +1,17 @@
 ---
 # tasks file for roles/aro
 
+# - fail:
+#     msg:
+#       pull secret - {{ aro_pull_secret }}
+
 - name: Create aro cluster
   azure.azcollection.azure_rm_openshiftmanagedcluster:
     resource_group: "{{ aro_resource_group }}"
     name: "{{ aro_cluster_name }}"
     location: "{{ aro_location }}"
     cluster_profile:
-      pull_secret: "{{ aro_pull_secret }}"
+      pull_secret: "{{ aro_pull_secret | default(omit) }}"
       domain: "{{ aro_domain | default(omit) }}"
     ingress_profiles:
       - visibility: "{{ aro_public_ingress | ternary('Public', 'Private') }}"
@@ -33,3 +37,11 @@
     - _aro_cluster.msg != "module doesn't support cluster update yet"
 
 # - include_tasks: wait-for-cluster.yml
+
+- name: fetch cluster info
+  azure.azcollection.azure_rm_openshiftmanagedcluster_info:
+    resource_group: "{{ aro_resource_group }}"
+    name: "{{ aro_cluster_name }}"
+  register: _aro_cluster_info
+
+- include_tasks: output.yml

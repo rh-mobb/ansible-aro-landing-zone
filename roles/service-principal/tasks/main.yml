@@ -1,7 +1,8 @@
 ---
 # tasks file for roles/service-principal
-# make sure we have known subscription id and tenant id
-# - include_tasks: info.yml
+- include_tasks: secrets.yml
+
+# - fail:
 
 - set_fact:
     app_display_name: "http://aro-{{ sp_aro_cluster_name }}"
