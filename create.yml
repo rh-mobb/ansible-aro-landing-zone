@@ -46,7 +46,7 @@
         aro_control_subnet_id: "{{ output_vnet_control_subnet_id }}"
         aro_worker_subnet_id: "{{ output_vnet_worker_subnet_id }}"
         aro_sp_client_id: "{{ output_sp_app_id }}"
-        aro_sp_client_secret: "{{ aro_sp_password }}"
+        aro_sp_client_secret: "{{ output_sp_aro_sp_password | default(aro_sp_password) }}"
     - role: bastion
       vars:
         bastion_name: "{{ hub_name }}-bastion"

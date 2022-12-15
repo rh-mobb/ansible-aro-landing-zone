@@ -11,7 +11,7 @@
 
 - name: destroy Azure Front Door CDN endpoint
   shell: |
-    az afd endpoint delete \
+    az afd endpoint delete --yes \
       --resource-group "{{ frontdoor_resource_group }}" \
       --endpoint-name "aro-ilb" \
       --profile-name "{{ frontdoor_afd_name }}"
